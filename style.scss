@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css?family=Tangerine&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Archivo+Narrow&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Dancing+Script&display=swap');
+* {
+  box-sizing: border-box;
+}
+html {
+  min-height: 100vh;
+  font-family: sans-serif;
+}
+body {
+  margin: 0;
+  background-image: url("img/da148f6ed063e70c0d65f68c00ad910e - Copy.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.game-title {
+  color: red;
+  font-family:'Tangerine', cursive;
+  font-weight: bolder;
+  text-align: center;
+  font-size: 5em;
+  //margin: 0;
+}
+.game-container {
+  margin: 50px auto;
+  display: grid;
+  grid-template-columns: repeat(6, auto);
+  grid-gap: 10px;
+  justify-content: center;
+  perspective: 500px;
+  .game-info-block {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom:10px;
+    .game-info {
+      color: darkblue;
+      font-size: 2em;
+      font-family: 'Archivo Narrow', sans-serif;
+      letter-spacing:2px;
+    }
+  }
+}
+.overlay-text {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: none;
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: rgb(224, 16, 16);
+  font-family: 'Dancing Script', cursive;
+  transition: background-color 500ms, font-size 500ms;
+  .overlay-text-small {
+    font-size: .3em;
+  }
+}

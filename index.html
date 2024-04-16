@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Pikachu</title>
+</head>
+<body>
+<h1 class="game-title">PiKaChu</h1>
+<div class="overlay-text visible">
+    Click to Start
+</div>
+
+<div id="gameOverText" class="overlay-text">
+    GAME OVER!
+    <span class="overlay-text-small">Click to Restart</span>
+</div>
+<div id="winText" class="overlay-text">
+    YOU WIN!
+    <span class="overlay-text-small">Click to Restart</span>
+</div>
+
+<div id="gameMainBlock" class="game-container">
+    <div id="gameInfoBlock" class="game-info-block">
+        <div class="game-info">
+            <span id="Timer"></span>
+        </div>
+        <div class="game-info">
+            <span id="Flips"></span>
+        </div>
+    </div>
+</div>
+<script src="./index.js"></script>
+</body>
+</html>
