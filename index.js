@@ -1,12 +1,12 @@
-let row=11;
-let col =18;
+// let row=11;
+// let col =18;
 // Phần code lập ra ma trận và thuật toán trò chơi.
 class PikachuGame {
     constructor() {
     }
     // randomNum:tạo ra những số ngẫu nhiên
     randomNum(num){
-        return Math.round(Math.round()*(num-1));
+        return Math.round(Math.random()*(num-1));
     }
     //newArray: tạo mảng 1 chiều(hàng) để lưu lại có phần tử của 1 hàng trong ma trận.
     newArray(col){
@@ -21,33 +21,39 @@ class PikachuGame {
         return {x,y};
     }
     // mainBoard: tạo ra 1 ma trận 11x18 nhưng phần main là ma trận 9x16 vì cái hàng cột ngoài cùng sẽ là các line màu đỏ sẽ xuất hiện khi t chọn đc 2 pokêmon giống nhau
-    mainBoard(){
-        let stop;
+    mainBoard() {
+        let row = this.newArray(18);// hàng chứa 18 cột
+        let i, j, k;
         let key;//vị trí hiện tại đang kiểm để xem có trống ko
-        let eleNum=144;// 16x9=144
         let exist;// biến này đại diện số lần xuất hiện của 1 pokemon tối đa là 4 lần/1 pokemon
-        let row =this.newArray(18);
-        for(let i=1;i<=18;i++){
-            for(let j=1;j<=11;j++){
+        let eleNum=144;// 16x9=144
+        let stop;
+
+        for(let i=0;i<18;i++){
+            for(let j=0;j<11;j++){
                 row[i][j]=0;
             }
         }
-        for(let x=1;x<=36;x++){// 36 loại pokemon khác nhau.
-            for(exist=1;exist<=4;exist++){// mỗi loại có 4 con
-                key = this.randomNum(eleNum--)+1;//+1 để tránh key =0;
-                stop=false;// nếu stop = false thì vòng lặp tiếp tục
-                for(let i=1;i<=16;i++){
-                    if(stop) break;
-                    else for (let j=1;j<=9;j++){
-                        if(row[i][j]==0){// nếu vị trí hiện tại trống.
-                            key--;
-                            if(key==0){
-                                stop=true;// nếu stop bằng true có nghĩa là vòng lặp sẽ dừng ngay lập tức và không kiểm tra các ô trống còn lại
-                                row[i][j]=k;
-                                break;
+        //16x9 = 144 thẻ
+
+        for (k = 1; k <= 36; k++) {
+            for (exist = 1; exist <= 4; exist++) {
+                key = this.randomNum(eleNum--) + 1;
+                stop = false;
+                for (i = 1; i <= 16; i++) {
+                    if (stop) break;
+                    else
+                        for (j = 1; j <= 9; j++){
+                            if (row[i][j] == 0) {
+                                key--;
+                                if (key == 0) {
+                                    stop = true;
+                                    row[i][j] = k;
+                                    break;
+                                }
                             }
                         }
-                    }
+
                 }
             }
         }
@@ -428,8 +434,8 @@ class draw {
 const drawClass = new draw();
 //==============Tạo khung cho game===============================================
 function section(board, col, row, value, firstActive) {
-    let PieceWidth = 42;
-    let PieceHeight = 52;
+    let PieceWidth = 42;// chiều rộng 1 thẻ
+    let PieceHeight = 52;// chiều dài 1 thẻ
     let div = document.createElement("div");
     div.classList.add("section");
     div.image = document.createElement("img");
@@ -881,5 +887,5 @@ function getBox(title) {
     </div>
   </div>`;
 }
-const gameClass = new Game(PikachuGameClass, section, drawClass);
+const gameClass = new Game(pikachuGame, section, drawClass);
 gameClass.init();

@@ -58,6 +58,9 @@ body .main_board_wrap .main_left h4 {
   text-align: center;
   font-size: 6em;
 }
+body .main_board_wrap .main_left .button {
+  margin: 10px 0;
+}
 body .main_board_wrap .main_left .button button {
   background-color: yellow;
   width: 100px;
