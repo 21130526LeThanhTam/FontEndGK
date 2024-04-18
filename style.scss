@@ -10,12 +10,22 @@ html {
   min-height: 100vh;
   //font-family: sans-serif;
 }
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+}
 body {
   margin: 0;
   background-image: url("img/da148f6ed063e70c0d65f68c00ad910e.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+
   .main {
     &_board {
       height: 100%;
