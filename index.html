@@ -1,3 +1,4 @@
+<!--Lê Thành Tâm 21120526-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,27 +7,38 @@
     <title>Pikachu</title>
 </head>
 <body>
-<h1 class="game-title">PiKaChu</h1>
-<div class="overlay-text visible">
-    Click to Start
-</div>
-
-<div id="gameOverText" class="overlay-text">
-    GAME OVER!
-    <span class="overlay-text-small">Click to Restart</span>
-</div>
-<div id="winText" class="overlay-text">
-    YOU WIN!
-    <span class="overlay-text-small">Click to Restart</span>
-</div>
-
-<div id="gameMainBlock" class="game-container">
-    <div id="gameInfoBlock" class="game-info-block">
-        <div class="game-info">
-            <span id="Timer"></span>
-        </div>
-        <div class="game-info">
-            <span id="Flips"></span>
+<div class="main">
+    <div class="main_board">
+        <div class="main_board_wrap">
+            <div class="main_left">
+                <h4>Pikachu</h4>
+                <div class="button">
+                    <button class="menu__btn">Chơi lại</button>
+                    <button class="again__btn">Hoán đổi</button>
+                </div>
+                <h5>Điểm</h5>
+                <span class="current__score">0</span>
+                <h5>Cấp độ</h5>
+                <span class="current__level">1</span>
+                <h5 class="blood">Máu</h5>
+                <span class="current__blood">10</span>
+            </div>
+            <div class="main_center">
+                <div class="navbar">
+                    <button class="instruction">Hướng dẫn</button>
+                    <button id="lv1" class="level">lv 1</button>
+                    <button id="lv2" class="level">lv 2</button>
+                    <button id="lv3" class="level">lv 3</button>
+                    <button id="lv4" class="level">lv 4</button>
+                </div>
+            </div>
+            <div class="main_right">
+                <h5>Time</h5>
+                <div class="time_bar">
+                    <div class="time_line"></div>
+                    <span class="time_text"></span>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -426,4 +426,460 @@ class draw {
     }
 }
 const drawClass = new draw();
-//=============================================================
+//==============Tạo khung cho game===============================================
+function section(board, col, row, value, firstActive) {
+    let PieceWidth = 42;
+    let PieceHeight = 52;
+    let div = document.createElement("div");
+    div.classList.add("section");
+    div.image = document.createElement("img");
+    div.setAttribute("col", col);
+    div.setAttribute("row", row);
+    div.setImage = function (imgIndex) {
+        this.image.src = "images/section" + imgIndex + ".png";
+        this.valueInMatrix = imgIndex;
+    };
+    if (col === firstActive?.col && row === firstActive?.row) {
+        div.style.opacity = "50%";
+    }
+
+    if (value > 0) {
+        div.style.cursor = "pointer";
+
+        div.setImage(value);
+    }
+    div.appendChild(div.image);
+
+    div.board = board;
+    div.colIndex = col;
+    div.rowIndex = row;
+
+    div.style.position = "absolute";
+    div.style.left = col * PieceWidth + "px";
+    div.style.top = row * PieceHeight + "px";
+    div.style.width = PieceWidth + "px";
+    div.style.height = PieceHeight + "px";
+
+    div.isVisible = true;
+
+    div.setVisible = function (flag) {
+        this.isVisible = flag;
+        this.style.visibility = flag ? "visible" : "hidden";
+    };
+
+    div.setBorder = function (thick, color) {
+        this.image.border = thick;
+        this.image.style.borderColor = color;
+    };
+
+    div.setHightlight = function () {
+        this.setBorder(1, "red");
+    };
+
+    div.setNormal = function () {
+        this.setBorder(1, "#009933");
+    };
+
+    div.onmouseover = function () {
+        this.setHightlight();
+    };
+
+    div.onmouseout = function () {
+        this.setNormal();
+    };
+    div.onclick = () => {};
+
+    div.setNormal();
+
+    return div;
+}
+
+let firstActive = null;
+let secondActive = null;
+
+let timeInterval;
+
+let levels = [
+    {
+        level: 1,
+        title: "Bình thường",
+        duration: 500,
+        blood: 10,
+    },
+    {
+        level: 2,
+        title: "Thả xuống dưới",
+        duration: 800,
+        blood: 9,
+    },
+    {
+        level: 3,
+        title: "Thả lên trên",
+        duration: 800,
+        blood: 8,
+    },
+    {
+        level: 4,
+        title: "Thả qua trái",
+        duration: 800,
+        blood: 7,
+    },
+    {
+        level: 5,
+        title: "Thả qua phải",
+        duration: 800,
+        blood: 6,
+    },
+    {
+        level: 6,
+        title: "Tập trung giữa",
+        duration: 900,
+        blood: 5,
+    },
+];
+// Phần xử lý game
+class Game {
+    arrImages;
+    level = 1;
+    score = 0;
+    blood = 0;
+    round = 1;
+    duration;
+    constructor(PikachuGame, section, draw) {
+        this.PikachuGame = PikachuGame;
+        this.section = section;
+        this.draw = draw;
+    }
+    //khởi tạo
+    init() {
+        this.renderMenuBoard();
+    }
+    //lấy sự kiện trang chủ khi nhấn vào nút bắt đầu
+    renderMenuBoard() {
+        const menuBoard = document.querySelector(".menu__board");
+        const mainBoard = document.querySelector(".main__board");
+        menuBoard.style.display = "block";
+        mainBoard.style.display = "none";
+        const start__btn = document.querySelector(".start__btn");
+        start__btn.onclick = () => {
+            this.score = 0;
+            this.round = 1;
+            this.renderMainBoard();
+        };
+    }
+    //chuyển sang giao diện trò chơi khi người dùng nhấn nút bắt đầu
+    renderMainBoard() {
+        const menuBoard = document.querySelector(".menu__board");
+        const mainBoard = document.querySelector(".main__board");
+        menuBoard.style.display = "none";
+        mainBoard.style.display = "block";
+        this.reloadGame();
+    }
+    //bắt sự kiện khi người dùng nhấn nút sẽ quay trở lại trang chủ sẽ khởi tạo lại toàn bộ
+    chooseRenderMenu() {
+        const menu__btns = document.querySelectorAll(".menu__btn");
+        menu__btns.forEach((btn) => {
+            btn.onclick = () => {
+                const main__board__box = document.querySelector(".main__board__box");
+                const main__board__layer = document.querySelector(".main__board__layer");
+                main__board__layer.style.opacity = "50%";
+                main__board__layer.style.zIndex = 0;
+                main__board__box.innerHTML = "";
+                main__board__box.style.display = "none";
+                this.round = 1;
+                this.score = 0;
+                this.renderMenuBoard();
+            };
+        });
+    }
+    //lấy vị trí của level trong mảng levels
+    getIndexLevel() {
+        return this.level - 1;
+    }
+    //khởi tạo giao diện game
+    reloadGame() {
+        clearInterval(timeInterval);
+        firstActive = null;
+        this.arrImages = this.PikachuGame.mainBoard();
+        this.blood = levels[this.getIndexLevel()].blood;
+        this.duration = levels[this.getIndexLevel()].duration;
+        this.loadImagesIcon();
+        this.renderTitle();
+        this.renderLevel();
+        this.renderScore();
+        this.renderBlood();
+        this.renderTimeBar();
+        this.renderRound();
+        this.chooseRenderMenu();
+        this.renderLevelOption();
+        this.playAgain();
+        this.chooseRepair();
+        this.chooseHelp();
+        this.hideHelp();
+    }
+    //hiển thị tên chế độ chơi
+    renderTitle() {
+        const titleEl = document.querySelector(".level__title");
+        titleEl.innerHTML = levels[this.getIndexLevel()].title;
+    }
+    //hiển thị level
+    renderLevel() {
+        const current__level = document.querySelector(".current__level");
+        current__level.innerHTML = levels[this.getIndexLevel()].level;
+    }
+    //hiển thị điểm
+    renderScore() {
+        const current__score = document.querySelector(".current__score");
+        current__score.innerHTML = this.score;
+    }
+    //hiển thị máu còn lại
+    renderBlood() {
+        const current__blood = document.querySelector(".current__blood");
+        current__blood.innerHTML = this.blood;
+    }
+    //hiển thị số lượng vòng chơi
+    renderRound() {
+        const current__round = document.querySelector(".current__round");
+        current__round.innerHTML = this.round;
+    }
+    //khởi tạo thanh thời gian đếm ngược
+    renderTimeBar() {
+        const timeBar = document.querySelector(".time__bar");
+        const timeText = document.querySelector(".time__text");
+        timeBar.style.height = this.duration / 2 + "px";
+        timeText.innerHTML = this.duration;
+        //cứ mỗi 1 giây thời gian sẽ giảm đi 1 -> cho tới khi bằng 0 sẽ cho hiện getBox và tái tạo lại màn chơi
+        timeInterval = setInterval(() => {
+            this.duration--;
+            if (this.duration === 0) {
+                this.renderNoTime();
+            }
+            const timeBar = document.querySelector(".time__bar");
+            const timeText = document.querySelector(".time__text");
+            timeBar.style.height = this.duration / 2 + "px";
+            timeText.innerHTML = this.duration;
+        }, 1000);
+    }
+    //khởi tạo khung game 16x9
+    loadImagesIcon() {
+        const mainWrapEl = document.querySelector(".main__wrap__box");
+        mainWrapEl.innerHTML = "";
+        var div = document.createElement("div");
+        div.classList.add("main__wrap__show");
+        div.arrPiece = this.PikachuGame.newArray(17);
+        for (var i = 1; i <= 16; i++) {
+            for (var j = 1; j <= 9; j++) {
+                div.arrPiece[i][j] = this.section(
+                    div,
+                    i,
+                    j,
+                    this.arrImages[i][j],
+                    firstActive,
+                    secondActive
+                );
+                div.appendChild(div.arrPiece[i][j]);
+            }
+        }
+        div.style.position = "relative";
+        div.style.width = 42 * 18 + "px";
+        div.style.height = 52 * 10 + "px";
+        mainWrapEl.append(div);
+        this.clickSection();
+    }
+    //bắt sự kiện khi người dùng nhấn chọn thẻ
+    clickSection() {
+        const sectionAll = document.querySelectorAll(".section");
+        sectionAll.forEach((section) => {
+            const col = section.getAttribute("col") * 1;
+            const row = section.getAttribute("row") * 1;
+            if (this.arrImages[col][row]) {
+                //sự kiện nhấn vào thẻ
+                section.onclick = () => {
+                    //sự kiện khi người dùng nhấn vào thẻ nếu thẻ đó đã được chọn thì hủy chọn
+                    if (firstActive) {
+                        if (firstActive?.col === col && firstActive?.row === row) {
+                            firstActive = null;
+                            this.loadImagesIcon();
+                            //ngược lại nếu thẻ vừa chọn không phải là thẻ đã được chọn trước đó thì sẽ tìm đường đi
+                        } else {
+                            const getPath = this.PikachuGame.checkPath(
+                                this.arrImages,
+                                firstActive.col,
+                                firstActive.row,
+                                col,
+                                row
+                            );
+                            //nếu getPath=true thì thẻ chọn đầu tiên và thẻ thứ 2 sẽ bị xoá
+                            if (getPath) {
+                                this.arrImages[firstActive.col][firstActive.row] = 0;
+                                this.arrImages[col][row] = 0;
+                                this.playSuccessSound();
+                                this.drawPath(getPath);
+                                firstActive = null;
+                                drawRectPath = setTimeout(() => {
+                                    this.score += levels[this.getIndexLevel()].level;
+                                    this.renderScore();
+                                    if (this.level !== 1) {
+                                        this.arrImages = this.PikachuGame.getIndexLevelMatrix(
+                                            this.arrImages,
+                                            this.level
+                                        );
+                                    }
+                                    const checkHavePath = this.PikachuGame.checkHavePath(
+                                        this.arrImages
+                                    );
+                                    //khi hết màn sẽ tăng level thêm 1, kiểm tra level hiện tại nếu là lv6 sẽ trở về lv1.
+                                    if (this.PikachuGame.checkFinishRound(this.arrImages)) {
+                                        this.round++;
+                                        this.playSuccessSound();
+                                        if (this.level === 6) {
+                                            this.level = 1;
+                                        } else {
+                                            this.level++;
+                                        }
+                                        this.reloadGame();
+                                    } else {
+                                        //kiểm tra nếu không có đường đi nào thì sẽ di chuyển vị trí của các thẻ
+                                        if (!checkHavePath) {
+                                            this.arrImages = this.PikachuGame.fixMatrix(
+                                                this.arrImages
+                                            );
+                                        }
+                                    }
+                                    this.loadImagesIcon();
+                                }, 500);
+                                //trường hợp nếu giữa 2 thẻ không có đường đi thì trừ máu
+                            } else {
+                                this.blood--;
+                                //nếu máu về 0 thì cho hiện getbox và khởi tạo lại màn chơi
+                                if (this.blood === 0) {
+                                    this.renderNoBlood();
+                                }
+                                this.renderBlood();
+                                this.playFailSound();
+                                firstActive = null;
+                                this.loadImagesIcon();
+                            }
+                        }
+                    } else {
+                        firstActive = {
+                            col,
+                            row,
+                        };
+                        this.loadImagesIcon();
+                    }
+                };
+            }
+        });
+    }
+    //vẽ đường đi từ thẻ này sang  thẻ khác
+    drawPath(arrayList, help = false) {
+        const mainWrapShowEl = document.querySelector(".main__wrap__show");
+        let point1 = arrayList[0];
+        let point2;
+        let centre1, centre2;
+        let i, rectDraw;
+        for (i = 1; i < arrayList.length; i++) {
+            const divPath = document.createElement("div");
+            point2 = arrayList[i];
+            centre1 = this.draw.findCentre(point1.x, point1.y);
+            centre2 = this.draw.findCentre(point2.x, point2.y);
+            rectDraw = this.draw.getRectDraw(centre1, centre2);
+            divPath.style.left = rectDraw.x + "px";
+            divPath.style.top = rectDraw.y + "px";
+            divPath.style.width = rectDraw.width + "px";
+            divPath.style.height = rectDraw.height + "px";
+            divPath.style.position = "absolute";
+            divPath.style.backgroundColor = help ? "red" : "#fff";
+            divPath.style.pointerEvents = "none";
+            mainWrapShowEl.append(divPath);
+            point1 = point2;
+        }
+    }
+    // xử lí sounds
+    playSuccessSound() {
+        const successEl = document.querySelector(".success__sound");
+        const failEl = document.querySelector(".fail__sound");
+        failEl.pause();
+        successEl.load();
+        successEl.play();
+    }
+    playFailSound() {
+        const failEl = document.querySelector(".fail__sound");
+        const successEl = document.querySelector(".success__sound");
+        successEl.pause();
+        failEl.load();
+        failEl.play();
+    }
+    //lấy thông tin để gán vào getBox()
+    renderInfoBox() {
+        const box__lv = document.querySelector(".box__lv");
+        const box__round = document.querySelector(".box__round");
+        const box__score = document.querySelector(".box__score");
+        box__lv.innerHTML = this.level;
+        box__round.innerHTML = this.round;
+        box__score.innerHTML = this.score;
+    }
+    renderNoBlood() {
+        this.playFailSound
+        //Đây là 1 lớp layer, về cơ bản nó vẫn tồn tại nhưng bị đè bởi các lớp khác,
+        //khi thua nó sẽ được di chuyển lên để che đi các lớp khác,
+        const main__board__box = document.querySelector(".main__board__box");
+        const main__board__layer = document.querySelector(".main__board__layer");
+        main__board__layer.style.opacity = "80%";
+        main__board__layer.style.zIndex = 2;
+        main__board__box.style.display = "flex";
+        //=============
+        clearInterval(timeInterval);
+        main__board__box.innerHTML = getBox("Bạn đã hết lượt chơi");
+        this.renderInfoBox();
+        this.chooseRenderMenu();
+        this.playAgain();
+    }
+    renderNoTime() {
+        this.playFailSound();
+        //Đây là 1 lớp layer, về cơ bản nó vẫn tồn tại nhưng bị đè bởi các lớp khác,
+        //khi thua nó sẽ được di chuyển lên để che đi các lớp khác,
+        const main__board__box = document.querySelector(".main__board__box");
+        const main__board__layer = document.querySelector(".main__board__layer");
+        main__board__layer.style.opacity = "80%";
+        main__board__layer.style.zIndex = 2;
+        main__board__box.style.display = "flex";
+        //=============
+        clearInterval(timeInterval);
+        main__board__box.innerHTML = getBox("Bạn đã hết thời gian");
+        this.renderInfoBox();
+        this.chooseRenderMenu();
+        this.playAgain();
+    }
+    renderLevelOption(){
+
+    }
+    playAgain(){
+
+    }
+    chooseRepair(){
+
+    }
+    chooseHelp(){
+
+    }
+    hideHelp(){
+
+    }
+}
+//box hiên ra khi người dùng hết thời gian hoặc hết máu
+function getBox(title) {
+    return `<div class="box__wrap">
+    <h5>${title}</h5>
+    <p>Cấp độ: <span class="box__lv"></span></p>
+    <p>Vòng: <span class="box__round"></span></p>
+    <p>Điểm đạt được: <span class="box__score"></span></p>
+    <div class="box__btn">
+      <button class="again__btn">Chơi lại</button>
+      <button class="menu__btn">Trang chủ</button>
+    </div>
+  </div>`;
+}
+const gameClass = new Game(PikachuGameClass, section, drawClass);
+gameClass.init();
