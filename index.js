@@ -436,12 +436,12 @@ const drawClass = new draw();
 function section(board, col, row, value, firstActive) {
     let PieceWidth = 42;// chiều rộng 1 thẻ
     let PieceHeight = 52;// chiều dài 1 thẻ
-    let div = document.createElement("div");
-    div.classList.add("section");
-    div.image = document.createElement("img");
-    div.setAttribute("col", col);
-    div.setAttribute("row", row);
-    div.setImage = function (imgIndex) {
+    let div = document.createElement("div");// tạo thẻ div chứa ảnh
+    div.classList.add("section");// đặt class thẻ div là section
+    div.image = document.createElement("img");// tạo ra thẻ img trong thẻ <div class="section">
+    div.setAttribute("col", col);// thêm thuộc tính cột
+    div.setAttribute("row", row);// hàng
+    div.setImage = function (imgIndex) {// thêm ảnh cho thẻ
         this.image.src = "images/section" + imgIndex + ".png";
         this.valueInMatrix = imgIndex;
     };
@@ -451,7 +451,6 @@ function section(board, col, row, value, firstActive) {
 
     if (value > 0) {
         div.style.cursor = "pointer";
-
         div.setImage(value);
     }
     div.appendChild(div.image);
@@ -461,10 +460,10 @@ function section(board, col, row, value, firstActive) {
     div.rowIndex = row;
 
     div.style.position = "absolute";
-    div.style.left = col * PieceWidth + "px";
-    div.style.top = row * PieceHeight + "px";
-    div.style.width = PieceWidth + "px";
-    div.style.height = PieceHeight + "px";
+    div.style.left = col * PieceWidth + "px";// định vị vị trí
+    div.style.top = row * PieceHeight + "px";// định vị vị trí
+    div.style.width = PieceWidth + "px";// chiều rộng khung
+    div.style.height = PieceHeight + "px";// chiều dài khung
 
     div.isVisible = true;
 
@@ -514,7 +513,7 @@ let levels = [
     },
     {
         level: 2,
-        title: "Thả xuống dưới",
+        title: "có thời gian",
         duration: 800,
         blood: 9,
     },
